@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>节日照片展示</title>
+    <style>
+        body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.background {
+    width: 100vw;
+    height: 100vh;
+    animation: gradient 15s ease infinite;
+    background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff, #ffff00);
+    background-size: 400% 400%;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    backdrop-filter: blur(5px);
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.streamers {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.streamer {
+    position: absolute;
+    width: 10px;
+    height: 100vh;
+    opacity: 0.5;
+    animation: streamerFlow 10s linear infinite;
+    transform: rotate(45deg);
+}
+
+@keyframes streamerFlow {
+    0% {
+        top: -100%;
+        left: -100%;
+    }
+
+    100% {
+        top: 100%;
+        left: 100%;
+    }
+}
+
+.eggs {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.egg {
+    position: absolute;
+    width: 50px;
+    height: 80px;
+    background: linear-gradient(45deg, #ffd700, #daa520);
+    border-radius: 50%;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+    animation: eggMove 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+@keyframes eggMove {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(200px, 200px);
+    }
+}
+
+.photo-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    animation: rotate 20s linear infinite;
+    transform-style: preserve-3d;
+}
+
+.photo {
+    position: absolute;
+    width: 100px;
+    height: auto;
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+.photo:hover {
+    transform: scale(1.2);
+    filter: drop-shadow(0 0 10px gold);
+}
+
+.center-photo {
+    transform: scale(2);
+    filter: drop-shadow(0 0 10px gold);
+    z-index: 1;
+}
+
+.starfield {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: starTwinkle 3s ease-in-out infinite;
+}
+
+@keyframes starTwinkle {
+    0% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0.5;
+    }
+}
+
+.heart {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: red;
+    transform: rotate(-45deg);
+    animation: heartFloat 2s ease-out forwards;
+}
+
+.heart::before,
+.heart::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50%;
+}
+
+.heart::before {
+    top: -10px;
+    left: 0;
+}
+
+.heart::after {
+    left: 10px;
+    top: 0;
+}
+
+@keyframes heartFloat {
+    0% {
+        opacity: 1;
+        transform: rotate(-45deg) translate(0, 0);
+    }
+
+    100% {
+        opacity: 0;
+        transform: rotate(-45deg) translate(0, -100px);
+    }
+}    
+    </style>
+</head>
+
+<body>
+    <div class="background">
+        <div class="streamers"></div>
+        <div class="eggs"></div>
+        <div class="starfield"></div>
+        <div class="photo-container">
+            <img src="https://dummyimage.com/300x200/ff0000/ffffff" alt="Photo 1" class="photo">
+            <img src="https://dummyimage.com/300x200/00ff00/ffffff" alt="Photo 2" class="photo">
+            <img src="https://dummyimage.com/300x200/0000ff/ffffff" alt="Photo 3" class="photo">
+            <img src="https://dummyimage.com/300x200/ffff00/ffffff" alt="Photo 4" class="photo">
+            <img src="https://dummyimage.com/300x200/ff00ff/ffffff" alt="Photo 5" class="photo">
+        </div>
+    </div>
+    <audio id="swapSound" src="swap.mp3"></audio>
+    <script>
+        // 彩带颜色和宽度
+const streamerColors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff8c00', '#800080'];
+const streamerWidths = [5, 10, 15, 20, 25, 30, 35, 40];
+
+// 创建彩带
+const streamersContainer = document.querySelector('.streamers');
+for (let i = 0; i < 8; i++) {
+    const streamer = document.createElement('div');
+    streamer.classList.add('streamer');
+    streamer.style.width = `${streamerWidths[i]}px`;
+    streamer.style.background = streamerColors[i];
+    streamer.style.animationDuration = `${Math.random() * 5 + 5}s`;
+    streamersContainer.appendChild(streamer);
+}
+
+// 创建金蛋
+const eggsContainer = document.querySelector('.eggs');
+for (let i = 0; i < 6; i++) {
+    const egg = document.createElement('div');
+    egg.classList.add('egg');
+    egg.style.left = `${Math.random() * 100}vw`;
+    egg.style.top = `${Math.random() * 100}vh`;
+    egg.style.animationDuration = `${Math.random() * 8 + 8}s`;
+    eggsContainer.appendChild(egg);
+}
+
+// 照片自动换位
+const photos = document.querySelectorAll('.photo');
+let currentCenter = 0;
+
+function repositionPhotos() {
+    photos.forEach((photo, index) => {
+        const diff = index - currentCenter;
+        const left = 50 + diff * 30 + '%';
+        const top = 50 + Math.abs(diff) * 5 + '%';
+        photo.style.left = left;
+        photo.style.top = top;
+        photo.classList.remove('center-photo');
+    });
+    photos[currentCenter].classList.add('center-photo');
+    currentCenter = (currentCenter + 1) % photos.length;
+    const swapSound = document.getElementById('swapSound');
+    swapSound.play();
+}
+
+setInterval(repositionPhotos, 2000);
+
+// 页面加载动画
+photos.forEach((photo, index) => {
+    photo.style.transform = 'scale(0)';
+    photo.style.left = '-100%';
+    setTimeout(() => {
+        photo.style.transform = 'scale(1)';
+        photo.style.left = '0';
+    }, index * 500);
+});
+
+// 背景星光粒子动画
+const starfield = document.querySelector('.starfield');
+for (let i = 0; i < 100; i++) {
+    const star = document.createElement('div');
+    star.classList.add('star');
+    star.style.left = `${Math.random() * 100}vw`;
+    star.style.top = `${Math.random() * 100}vh`;
+    star.style.animationDuration = `${Math.random() * 3 + 1}s`;
+    starfield.appendChild(star);
+}
+
+// 点击照片触发爱心特效
+photos.forEach(photo => {
+    photo.addEventListener('click', (e) => {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.style.left = `${e.clientX}px`;
+        heart.style.top = `${e.clientY}px`;
+        document.body.appendChild(heart);
+        setTimeout(() => {
+            heart.remove();
+        }, 2000);
+    });
+});    
+    </script>
+</body>
+
+</html>    
